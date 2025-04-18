@@ -142,7 +142,7 @@
         }
     </style>
 </head>
-<body class="relative overflow-hidden">
+<body class="relative overflow-hidden flex items-center justify-center min-h-screen">
     <!-- Audio Element -->
     <audio id="birthdaySong" loop>
         <source src="https://www2.cs.uic.edu/~i101/SoundFiles/HappyBirthday.mid" type="audio/midi">
@@ -188,8 +188,8 @@
         </div>
         
         <!-- Result Screen (Hidden Initially) -->
-        <div id="result-screen" class="hidden flex-col items-center justify-center min-h-screen">
-            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
+        <div id="result-screen" class="hidden flex flex-col items-center justify-center min-h-screen text-center">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full mx-auto">
                 <h1 class="text-4xl md:text-5xl font-bold mb-6 text-green-600 title-font">Chúc Mừng Bạn!</h1>
                 <p class="text-xl mb-4 text-gray-700">Bạn sẽ được tặng Khiêm số tiền là:</p>
                 <div class="text-5xl font-bold text-yellow-600 mb-8" id="prize-amount">100,000 VNĐ</div>
@@ -452,7 +452,7 @@
             revealBtn.addEventListener('click', revealCup);
             
             shareBtn.addEventListener('click', function() {
-                window.open("https://www.facebook.com/hoangmanhkhiem.IT/posts/pfbid02wpKokttS8BN4JqfAYUQ1U4ArX8Voh6edzBnrvCNfYAkjSQjM3QYmLXGjroo14dhPl", "_blank");
+                window.open("https://www.facebook.com/hoangmanhkhiem.IT/posts/pfbid02wpKokttS8BN4JqfAYUQ1U4ArX8Voh6edzBnrvCNfYAkjSQjM3QYmLXGjroo14dhPl?comment_id=684621811188557&notif_id=1744980553099270&notif_t=feed_comment&ref=notif", "_blank");
             });
             
             
