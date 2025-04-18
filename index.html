@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Sinh Nhật Khiêm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Dancing+Script:wght@700&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .title-font {
+            font-family: 'Dancing Script', cursive;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #d4af37;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+        
+        .wheel-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff0000;
+            z-index: 10;
+        }
+        
+        .cup {
+            width: 200px;
+            height: 150px;
+            background-color: #d4af37;
+            border-radius: 0 0 100px 100px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(0);
+            transition: transform 0.5s;
+        }
+        
+        .cup-handle {
+            position: absolute;
+            right: -40px;
+            top: 30px;
+            width: 40px;
+            height: 80px;
+            border: 15px solid #d4af37;
+            border-left: none;
+            border-radius: 0 50px 50px 0;
+        }
+        
+        .cup-lid {
+            width: 220px;
+            height: 30px;
+            background-color: #b8860b;
+            border-radius: 100px 100px 0 0;
+            position: absolute;
+            top: -30px;
+            left: -10px;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .money-note {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background-color: #e6e6fa;
+            border: 1px dashed #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.5s;
+            z-index: 5;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .qr-code {
+            transition: all 0.5s;
+            transform: scale(0);
+        }
+        
+        .qr-code.show {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="relative overflow-hidden">
+    <!-- Audio Element -->
+    <audio id="birthdaySong" loop>
+        <source src="https://www2.cs.uic.edu/~i101/SoundFiles/HappyBirthday.mid" type="audio/midi">
+    </audio>
+    
+    <!-- Confetti Container -->
+    <div id="confetti-container"></div>
+    
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 text-center">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="flex flex-col items-center justify-center min-h-screen">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full transform transition-all duration-500 hover:scale-105">
+                <h1 class="text-5xl md:text-6xl font-bold mb-6 text-pink-600 title-font">Chúc Mừng Sinh Nhật Khiêm!</h1>
+                <p class="text-xl mb-8 text-gray-700">Nhân dịp sinh nhật của Khiêm, chúng tôi có tổ chức một buổi Party Online!!</p>
+                
+                <div class="floating mb-8">
+                    <i class="fas fa-gift text-6xl text-red-500"></i>
+                </div>
+                
+                <button id="start-btn" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-4 px-8 rounded-full text-xl hover:from-purple-600 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-play mr-2"></i> Bắt Đầu Tham Dự
+                </button>
+                
+            </div>
+        </div>
+        
+        <!-- Game Screen (Hidden Initially) -->
+        <div id="game-screen" class="hidden flex-col items-center justify-center min-h-screen">
+            <h2 class="text-4xl font-bold mb-8 text-purple-700 title-font">Vòng Quay May Mắn</h2>
+            <p class="text-xl mb-8 text-gray-700">Hãy quay vòng tròn để test nhân phẩm!</p>
+            
+            <div class="wheel-container mb-12">
+                <div class="wheel-pointer"></div>
+                <div id="wheel" class="wheel">
+                    <!-- Wheel sections will be added by JavaScript -->
+                </div>
+            </div>
+            
+            <button id="spin-btn" class="bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold py-3 px-6 rounded-full text-lg hover:from-blue-500 hover:to-green-500 transition-all duration-300 shadow-lg hover:shadow-xl mb-8">
+                <i class="fas fa-redo mr-2"></i> Quay Ngay
+            </button>   
+        </div>
+        
+        <!-- Result Screen (Hidden Initially) -->
+        <div id="result-screen" class="hidden flex-col items-center justify-center min-h-screen">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 text-green-600 title-font">Chúc Mừng Bạn!</h1>
+                <p class="text-xl mb-4 text-gray-700">Bạn sẽ được tặng Khiêm số tiền là:</p>
+                <div class="text-5xl font-bold text-yellow-600 mb-8" id="prize-amount">100,000 VNĐ</div>
+                
+                <p class="text-lg mb-6 text-gray-700">Hãy quét mã QR bên dưới để chuyển khoản cho Khiêm nhé!</p>
+                <p class="text-lg mb-6 text-gray-700">Chúc bạn một ngày vui vẻ hehehehehehehe!!!!</p>
+                
+                <div class="flex justify-center mb-8">
+                    <div class="qr-code p-4 bg-white rounded-lg shadow-md" id="qr-code">
+                        <img src="" alt="QR Code sẽ hiện ở đây" class="mx-auto w-64 h-64">
+                    </div>
+                    
+                </div>
+                
+                <div class="flex space-x-4 justify-center">
+                    <button id="play-again-btn" class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-6 rounded-full text-lg hover:from-indigo-500 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-redo mr-2"></i> Chơi Lại
+                    </button>
+                    <button id="share-btn" class="bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-6 rounded-full text-lg hover:from-teal-500 hover:to-green-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-share-alt mr-2"></i> Chia Sẻ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const resultScreen = document.getElementById('result-screen');
+            const startBtn = document.getElementById('start-btn');
+            const spinBtn = document.getElementById('spin-btn');
+            const revealBtn = document.getElementById('reveal-btn');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const shareBtn = document.getElementById('share-btn');
+            const wheel = document.getElementById('wheel');
+            const cup = document.getElementById('cup');
+            const prizeAmount = document.getElementById('prize-amount');
+            const qrCode = document.getElementById('qr-code');
+            const birthdaySong = document.getElementById('birthdaySong');
+            const confettiContainer = document.getElementById('confetti-container');
+            
+            // Game variables
+            let isSpinning = false;
+            let currentPrize = 0;
+            const prizes = [10,20, 50, 100, 200, 500];
+            
+            // Initialize the wheel
+            function initWheel() {
+                wheel.innerHTML = '';
+                const sectionAngle = 55 // Each section gets an equal angle
+            
+                prizes.forEach((prize, index) => {
+                    const section = document.createElement('div');
+                    section.className = 'wheel-section';
+                    section.style.transform = `rotate(${sectionAngle * (index)}deg)`; 
+                    section.style.backgroundColor = getRandomColor(index); 
+                    // Create a span for the text
+                    const sectionText = document.createElement('span');
+                    sectionText.textContent = `${prize.toLocaleString()} K VNĐ`;
+            
+                    sectionText.style.position = 'absolute';
+                    sectionText.style.top = '50%';
+                    sectionText.style.left = '50%';
+                    sectionText.style.transform = `rotate(${-(sectionAngle / 2)}deg) translate(-50%, -50%)`;
+            
+                    section.appendChild(sectionText);
+                    wheel.appendChild(section);
+                });
+            }       
+            
+
+            
+            
+            // Initialize cup game
+            function initCupGame() {
+                cup.innerHTML = '';
+                
+                // Add money notes inside the cup
+                for (let i = 0; i < 3; i++) {
+                    const moneyNote = document.createElement('div');
+                    moneyNote.className = 'money-note';
+                    moneyNote.style.bottom = `${10 + i * 10}px`;
+                    moneyNote.style.left = `${30 + i * 20}px`;
+                    moneyNote.style.transform = `rotate(${i * 10}deg)`;
+                    moneyNote.textContent = '???';
+                    moneyNote.dataset.value = prizes[Math.floor(Math.random() * prizes.length)];
+                    cup.appendChild(moneyNote);
+                }
+            }
+            
+            // Get random color for wheel sections
+            function getRandomColor(index) {
+                const colors = [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                    '#9966FF', '#FF9F40', '#8AC24A', '#607D8B'
+                ];
+                return colors[index % colors.length];
+            }
+            
+            // Create confetti effect
+            function createConfetti() {
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = getRandomColor();
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    
+                    confettiContainer.appendChild(confetti);
+                    
+                    // Animate confetti
+                    setTimeout(() => {
+                        confetti.style.opacity = '1';
+                        confetti.style.top = '-10px';
+                        confetti.style.transform = `rotate(${Math.random() * 360}deg) translateY(${Math.random() * 100 + 100}vh)`;
+                        confetti.style.transition = `all ${Math.random() * 3 + 2}s ease-out`;
+                        
+                        // Remove confetti after animation
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 5000);
+                    }, 0);
+                }
+            }
+            
+            // Spin the wheel
+            function spinWheel() {
+                if (isSpinning) return;
+                isSpinning = true;
+                
+                // Random rotation (5-10 full rotations plus offset to land on a prize)
+                const spinAngle = 1800 + Math.floor(Math.random() * 1800);
+                const sectionAngle = 360 / prizes.length;
+                const winningIndex = Math.floor(Math.random() * prizes.length);
+                const stopAngle = spinAngle - (spinAngle % sectionAngle) + (winningIndex * sectionAngle) + (sectionAngle / 2);
+                
+                wheel.style.transform = `rotate(${stopAngle}deg)`;
+                
+                // After spinning, show the prize
+                setTimeout(() => {
+                    isSpinning = false;
+                    currentPrize = prizes[winningIndex];
+                    showResult();
+                }, 3000);
+            }
+            
+            // Reveal cup contents
+            function revealCup() {
+                if (isSpinning) return;
+                isSpinning = true;
+                
+                // Animate cup lifting
+                cup.style.transform = 'translateY(-50px)';
+                
+                // Show money notes
+                const moneyNotes = document.querySelectorAll('.money-note');
+                let delay = 0;
+                
+                moneyNotes.forEach(note => {
+                    setTimeout(() => {
+                        note.style.transform = `rotate(${Math.random() * 30 - 15}deg) translateY(-100px)`;
+                        note.textContent = note.dataset.value.toLocaleString() + ' VNĐ';
+                        note.style.backgroundColor = '#e6ffb3';
+                    }, delay);
+                    delay += 300;
+                });
+                
+                // Select a random note as the prize
+                setTimeout(() => {
+                    const winningNote = moneyNotes[Math.floor(Math.random() * moneyNotes.length)];
+                    currentPrize = parseInt(winningNote.dataset.value);
+                    showResult();
+                }, delay + 300);
+            }
+            
+            // Show result screen
+            function showResult() {
+                gameScreen.classList.add('hidden');
+                resultScreen.classList.remove('hidden');
+        
+                // Set prize amount
+                prizeAmount.textContent = currentPrize.toLocaleString() + '000 VNĐ';
+        
+                // Show QR code with animation (ẩn trước)
+                const qrImg = qrCode.querySelector('img');
+                qrImg.src = ''; // Clear QR first
+                currentPrize = currentPrize * 1000; // Convert to VNĐ
+                // Gọi API VietQR để lấy QR code động
+                fetch('https://api.vietqr.io/v2/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        accountNo: 9998668999,
+                        accountName: "HOANG MANH KHIEM",
+                        acqId: 970425,
+                        amount: currentPrize,
+                        addInfo: "Chuc mung sinh nhat Khiem",
+                        format: "text",
+                        template: "compact"
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.data && data.data.qrDataURL) {
+                        qrImg.src = data.data.qrDataURL;
+                    } else if (data.data && data.data.qrCode) {
+                        qrImg.src = data.data.qrCode;
+                    } else {
+                        qrImg.alt = "Không thể tạo mã QR";
+                    }
+        
+                    qrCode.classList.add('show'); // Show animation
+                })
+                .catch(err => {
+                    console.error("Lỗi khi gọi API VietQR:", err);
+                    qrImg.alt = "Lỗi tạo mã QR";
+                });
+        
+                // Create confetti
+                createConfetti();
+        
+                // Play birthday music
+                birthdaySong.play();
+            }
+            playAgainBtn.addEventListener('click', function() {
+                resultScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                qrCode.classList.remove('show');
+            
+                // Reset games
+                initWheel();
+                initCupGame();
+            
+                // Reset cup position
+                cup.style.transform = 'translateY(0)';
+            });
+            
+            // Event Listeners
+            startBtn.addEventListener('click', function() {
+                welcomeScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                
+                // Initialize games
+                initWheel();
+                initCupGame();
+                
+                // Play music
+                birthdaySong.play();
+            });
+            
+            spinBtn.addEventListener('click', spinWheel);
+            
+            revealBtn.addEventListener('click', revealCup);
+            
+            shareBtn.addEventListener('click', function() {
+                window.open("https://www.facebook.com/", "_blank");
+            });
+            
+            
+            // Toggle between wheel and cup game
+            const toggleGame = document.createElement('button');
+            toggleGame.className = 'fixed bottom-4 right-4 bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition-colors';
+            toggleGame.innerHTML = '<i class="fas fa-exchange-alt"></i>';
+            toggleGame.addEventListener('click', function() {
+                const wheelGame = document.querySelector('.wheel-container');
+                const cupGame = document.getElementById('cup-game');
+                
+                if (wheelGame.style.display !== 'none') {
+                    wheelGame.style.display = 'none';
+                    spinBtn.style.display = 'none';
+                    cupGame.style.display = 'block';
+                } else {
+                    wheelGame.style.display = 'block';
+                    spinBtn.style.display = 'inline-block';
+                    cupGame.style.display = 'none';
+                }
+            });
+            document.body.appendChild(toggleGame);
+        });
+
+        
+    </script>
+</body>
+</html>
